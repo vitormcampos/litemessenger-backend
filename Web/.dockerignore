@@ -1,0 +1,26 @@
+# Standard build artifacts
+**/bin/
+**/obj/
+
+# Visual Studio and IDE-related files
+.vs/
+.vscode/
+*.sln
+*.suo
+*.user
+*.config.user
+*.resharper
+
+# Source control
+.git/
+.gitignore
+
+# Package manager files (if applicable, e.g., for front-end assets)
+node_modules/
+
+# Docker files themselves
+Dockerfile
+docker-compose*.yml
+
+# Environment files
+.env
