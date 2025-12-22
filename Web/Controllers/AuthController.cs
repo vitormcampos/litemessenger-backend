@@ -10,15 +10,20 @@ namespace Web.Controllers;
 public class AuthController(JwtService jwtService, UserService userService) : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] CreateUser createUser)
+    public async Task<IActionResult> Register([FromBody] RegisterDto createUser)
     {
+        if (createUser.ConfirmPassword != createUser.Password)
+        {
+            return BadRequest("Password and confirmPassword does not match");
+        }
+
         var user = await userService.CreateUser(createUser.Username, createUser.Password);
 
         return Ok(new { user.Id, user.Username });
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] CreateUser loginUser)
+    public async Task<IActionResult> Login([FromBody] LoginDto loginUser)
     {
         var user = await userService.Login(loginUser.Username, loginUser.Password);
         if (user == null)
