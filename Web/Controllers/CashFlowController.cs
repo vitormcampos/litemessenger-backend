@@ -44,7 +44,7 @@ public class CashFlowController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.Sid);
 
-        var result = await _cashflowService.GetByIdAsync(id, userId);
+        var result = await _cashflowService.GetByIdAsync(id, userId!);
 
         return Ok(result);
     }
@@ -65,7 +65,7 @@ public class CashFlowController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.Sid);
 
-        await _cashflowService.DeleteAsync(id, userId);
+        await _cashflowService.DeleteAsync(id, userId!);
 
         return NoContent();
     }

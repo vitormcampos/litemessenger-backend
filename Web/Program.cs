@@ -6,12 +6,12 @@ using Scalar.AspNetCore;
 using Web.Extensions;
 using Web.Hubs;
 
-var builder = WebApplication.CreateBuilder(args);
-
-if (builder.Environment.IsDevelopment())
+if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
 {
     DotEnv.Load();
 }
+
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
