@@ -21,7 +21,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddChatClient(services =>
     new ChatClientBuilder(
-        new ChatClient("gpt-4o-mini", builder.Configuration["OpenAI:ApiKey"]).AsIChatClient()
+        new ChatClient("gpt-4o-mini", builder.Configuration["OpenAI:Key"]).AsIChatClient()
     )
         .UseFunctionInvocation()
         .Build()

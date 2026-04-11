@@ -15,3 +15,6 @@ ef-down:
 
 run:
 	dotnet run --project ${startup-project}
+
+run-mcp:
+	dotnet run --project ./McpServer/

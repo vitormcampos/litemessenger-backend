@@ -41,7 +41,7 @@ public class ChatHub : Hub
         ";
         var messages = new List<ChatMessage>
         {
-            new ChatMessage(ChatRole.System, systemPrompt),
+            new(ChatRole.System, systemPrompt),
             new(ChatRole.User, prompt),
         };
 
