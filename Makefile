@@ -1,5 +1,5 @@
-startup-project := ./FinanceiroBackend/
-project := ./Services/
+startup-project := ./Web/
+project := ./Application/
 
 ef-add:
 	dotnet ef migrations add $(name) --project ${project} --startup-project ${startup-project}
@@ -12,3 +12,6 @@ ef-up:
 
 ef-down:
 	dotnet ef database drop --project ${project} --startup-project ${startup-project}
+
+run:
+	dotnet run --project ${startup-project}

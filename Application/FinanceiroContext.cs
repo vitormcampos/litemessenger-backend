@@ -3,11 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application;
 
-public class FinanceiroContext : DbContext
+public class FinanceiroContext(DbContextOptions options) : DbContext(options)
 {
-    public FinanceiroContext(DbContextOptions<FinanceiroContext> options)
-        : base(options) { }
-
     public DbSet<CashFlow> CashFlows { get; set; }
     public DbSet<User> Users { get; set; }
 }

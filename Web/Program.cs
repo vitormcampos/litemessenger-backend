@@ -1,15 +1,9 @@
 using Application.Ioc;
-using dotenv.net;
 using Microsoft.Extensions.AI;
 using OpenAI.Chat;
 using Scalar.AspNetCore;
 using Web.Extensions;
 using Web.Hubs;
-
-if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-{
-    DotEnv.Load();
-}
 
 var builder = WebApplication.CreateBuilder(args);
 
