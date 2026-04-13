@@ -28,6 +28,7 @@ builder.Services.AddChatClient(services =>
 );
 
 builder.Services.AddApplicationServices();
+builder.Services.AddAgentServices();
 
 var app = builder.Build();
 
