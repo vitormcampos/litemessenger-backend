@@ -55,13 +55,13 @@ public class CashFlowAgent
     public async Task<IEnumerable<CashFlow>> GetCashFlowDataTool(
         [Description("A description to filter cash flow data.")] string? description,
         [Description("The status of the cash flow data to retrieve. [PAID, PENDING]")]
-            string? status,
+            CashFlowStatus? status,
         [Description("The month of the cash flow data to retrieve.")] sbyte? month,
         [Description("The year of the cash flow data to retrieve.")] sbyte? year,
         [Description("The minimum value of the cash flow data to retrieve.")] decimal? minValue,
         [Description("The maximum value of the cash flow data to retrieve.")] decimal? maxValue,
         [Description("The type of the cash flow data to retrieve. [INCOME, EXPENSE, INVESTMENT]")]
-            string? type,
+            CashFlowType? type,
         [Description("The ID of the user to retrieve cash flow data for.")] string? userId
     )
     {
@@ -83,9 +83,10 @@ public class CashFlowAgent
     [Description("Creates a new cash flow entry with the provided details.")]
     public async Task<CashFlow> CreateCashFlowDataTool(
         [Description("A description of the cash flow entry.")] string description,
-        [Description("The status of the cash flow entry.")] string status,
+        [Description("The status of the cash flow entry. [PAID, PENDING]")] CashFlowStatus status,
         [Description("The amount of the cash flow entry.")] decimal amount,
-        [Description("The type of the cash flow entry.")] string type,
+        [Description("The type of the cash flow entry. [INCOME, EXPENSE, INVESTMENT]")]
+            CashFlowType type,
         [Description("The ID of the user to create the cash flow entry for.")] string userId
     )
     {

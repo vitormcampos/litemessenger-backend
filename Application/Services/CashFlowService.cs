@@ -35,12 +35,12 @@ public class CashFlowService(FinanceiroContext context)
             queryable = queryable.Where(c => c.Year == query.Year);
         }
 
-        if (!string.IsNullOrEmpty(query.Status))
+        if (query.Status.HasValue)
         {
-            queryable = queryable.Where(c => c.Status == query.Status);
+            queryable = queryable.Where(c => c.Status == query.Status.Value);
         }
 
-        if (!string.IsNullOrEmpty(query.Type))
+        if (query.Type is not null)
         {
             queryable = queryable.Where(c => c.Type == query.Type);
         }

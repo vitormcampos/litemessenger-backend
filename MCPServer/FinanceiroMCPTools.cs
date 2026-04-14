@@ -37,7 +37,7 @@ public class FinanceiroMCPTools
             maxValue,
             month,
             year,
-            status,
+            string.IsNullOrEmpty(status) ? null : Enum.Parse<CashFlowStatus>(status),
             type,
             userId
         );
@@ -77,7 +77,7 @@ public class FinanceiroMCPTools
             {
                 Description = description,
                 Amount = amount,
-                Status = status,
+                Status = Enum.Parse<CashFlowStatus>(status),
                 Type = type,
                 UserId = userId,
             }

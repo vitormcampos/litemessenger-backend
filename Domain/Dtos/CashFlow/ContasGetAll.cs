@@ -1,4 +1,6 @@
-﻿namespace Domain.Dtos.CashFlow;
+﻿using Domain.Models;
+
+namespace Domain.Dtos.CashFlow;
 
 public record CashFlowsGetAll(
     string? Description,
@@ -6,7 +8,7 @@ public record CashFlowsGetAll(
     decimal? MaxValue,
     sbyte? Month,
     short? Year,
-    string? Status,
-    string? Type,
+    CashFlowStatus? Status,
+    CashFlowType? Type,
     string? UserId
 );

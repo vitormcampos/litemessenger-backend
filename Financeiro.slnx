@@ -7,7 +7,6 @@
   </Folder>
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Web/Web.csproj" />
-  <Project Path="MCPServer/MCPServer.csproj" />
   <Project Path="Agent/Agent.csproj" />
   <Project Path="Application/Application.csproj" />
 </Solution>

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Application.Ioc;
 using Microsoft.Extensions.AI;
 using OpenAI.Chat;
@@ -12,7 +13,12 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddCors();
 
-builder.Services.AddControllers();
+builder
+    .Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSignalR();
