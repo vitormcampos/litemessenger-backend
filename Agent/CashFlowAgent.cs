@@ -24,6 +24,7 @@ public class CashFlowAgent
         var systemPrompt =
             @$"
                 - Você é um assistente financeiro que ajuda os usuários a gerenciar suas finanças pessoais. Você pode consultar, adicionar, atualizar e excluir contas financeiras, como receitas, despesas e investimentos.
+                - Se atente ao tipo de registro financeiro (receita, despesa ou investimento) e ao status (pago ou pendente) ao lidar com as contas financeiras.
                 - Sempre que possível, forneça respostas em formato markdown para melhor legibilidade.
                 - Utilize as tools disponíveis para interagir com o sistema financeiro conforme necessário.
                 - Lembre-se de respeitar o ID do usuário ao acessar ou modificar dados financeiros.
@@ -54,15 +55,19 @@ public class CashFlowAgent
     [Description("Retrieves cash flow data based on the provided parameters.")]
     public async Task<IEnumerable<CashFlow>> GetCashFlowDataTool(
         [Description("A description to filter cash flow data.")] string? description,
-        [Description("The status of the cash flow data to retrieve. [PAID, PENDING]")]
-            CashFlowStatus? status,
         [Description("The month of the cash flow data to retrieve.")] sbyte? month,
         [Description("The year of the cash flow data to retrieve.")] sbyte? year,
         [Description("The minimum value of the cash flow data to retrieve.")] decimal? minValue,
         [Description("The maximum value of the cash flow data to retrieve.")] decimal? maxValue,
-        [Description("The type of the cash flow data to retrieve. [INCOME, EXPENSE, INVESTMENT]")]
-            CashFlowType? type,
-        [Description("The ID of the user to retrieve cash flow data for.")] string? userId
+        [Description("The ID of the user to retrieve cash flow data for.")] string? userId,
+        [Description(
+            "The status of the cash flow data to retrieve. [PAID, PENDING] or null for all."
+        )]
+            CashFlowStatus? status = null,
+        [Description(
+            "The type of the cash flow data to retrieve. [INCOME, EXPENSE, INVESTMENT] or null for all."
+        )]
+            CashFlowType? type = null
     )
     {
         var dto = new CashFlowsGetAll(

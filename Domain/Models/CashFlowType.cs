@@ -2,4 +2,8 @@ using System;
 
 namespace Domain.Models;
 
-public class CashFlowType { }
+public enum CashFlowType
+{
+    INCOME,
+    EXPENSE,
+}
