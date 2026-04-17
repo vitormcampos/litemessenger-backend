@@ -6,7 +6,7 @@ namespace Application.Services;
 
 public class CashFlowService(FinanceiroContext context)
 {
-    public async Task<IEnumerable<CashFlow>> GetAllAsync(CashFlowsGetAll query)
+    public async Task<IEnumerable<CashFlow>> GetAllAsync(CashFlowsGetAllDto query)
     {
         var queryable = context.CashFlows.AsQueryable();
 
@@ -27,7 +27,7 @@ public class CashFlowService(FinanceiroContext context)
 
         if (query.Month > 0)
         {
-            queryable = queryable.Where(c => c.Mouth == query.Month);
+            queryable = queryable.Where(c => c.Month == query.Month);
         }
 
         if (query.Year > 0)
@@ -50,25 +50,23 @@ public class CashFlowService(FinanceiroContext context)
         return await queryable.AsNoTracking().ToListAsync();
     }
 
-    public async Task<CashFlow> AddAsync(CreateCashFlow createCashFlow)
+    public async Task<CashFlow> AddAsync(CreateCashFlowDto dto, string userId)
     {
-        var cashFlow = new CashFlow
-        {
-            Id = Guid.NewGuid().ToString(),
-            Description = createCashFlow.Description,
-            Amount = createCashFlow.Amount,
-            Status = createCashFlow.Status,
-            Type = createCashFlow.Type,
-            Mouth = DateTime.UtcNow.Month,
-            Year = DateTime.UtcNow.Year,
-            CreatedAt = DateTime.UtcNow,
-            UserId = createCashFlow.UserId!,
-        };
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        var cashFlow = new CashFlow(
+            dto.Description,
+            dto.Amount,
+            dto.Month,
+            dto.Year,
+            user,
+            dto.Status,
+            dto.Type
+        );
 
         context.CashFlows.Add(cashFlow);
         await context.SaveChangesAsync();
 
-        return cashFlow;
+        return await context.CashFlows.AsNoTracking().FirstOrDefaultAsync(c => c.Id == cashFlow.Id);
     }
 
     public async Task<CashFlow> GetByIdAsync(string id, string userId)
@@ -78,10 +76,10 @@ public class CashFlowService(FinanceiroContext context)
             .FirstAsync(c => (c.Id == id || c.Description.Contains(id)) && c.UserId == userId);
     }
 
-    public async Task<CashFlow> UpdateAsync(string id, CreateCashFlow updateCashFlow)
+    public async Task<CashFlow> UpdateAsync(string id, CreateCashFlowDto updateCashFlow)
     {
         context
-            .CashFlows.Where(c => c.Id == id && c.UserId == updateCashFlow.UserId)
+            .CashFlows.Where(c => c.Id == id)
             .ExecuteUpdate(c =>
                 c.SetProperty(c => c.Description, updateCashFlow.Description)
                     .SetProperty(c => c.Amount, updateCashFlow.Amount)

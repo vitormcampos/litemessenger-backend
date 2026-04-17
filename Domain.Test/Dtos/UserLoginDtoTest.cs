@@ -7,11 +7,7 @@ public class UserLoginDtoTest
     [Fact]
     public void ShouldHaveCorrectProperties()
     {
-        var dto = new UserLoginDto
-        {
-            Username = "testuser",
-            Password = "password123"
-        };
+        var dto = new UserLoginDto { Username = "testuser", Password = "password123" };
 
         Assert.Equal("testuser", dto.Username);
         Assert.Equal("password123", dto.Password);

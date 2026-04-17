@@ -87,7 +87,9 @@ public class CashFlowAgent
         return await _agent.RunAsync(message: message, cancellationToken: cancellationToken);
     }
 
-    [Description("Retrieves financial entries with filters. Use to list transactions, search by period, type, or amount.")]
+    [Description(
+        "Retrieves financial entries with filters. Use to list transactions, search by period, type, or amount."
+    )]
     public async Task<IEnumerable<CashFlow>> GetCashFlowTool(
         [Description("Filter by description (partial match)")] string? description,
         [Description("Month of the entry (1-12)")] sbyte? month,
@@ -99,7 +101,7 @@ public class CashFlowAgent
         [Description("Type: INCOME, EXPENSE, or INVESTMENT")] CashFlowType? type
     )
     {
-        var dto = new CashFlowsGetAll(
+        var dto = new CashFlowsGetAllDto(
             Description: description,
             Status: status,
             Month: month,
@@ -136,16 +138,15 @@ public class CashFlowAgent
             throw new ArgumentException("Amount must be greater than zero.", nameof(amount));
         }
 
-        var dto = new CreateCashFlow
+        var dto = new CreateCashFlowDto
         {
             Description = description,
             Status = status,
             Amount = amount,
             Type = type,
-            UserId = userId,
         };
 
-        return await _cashFlowService.AddAsync(dto);
+        return await _cashFlowService.AddAsync(dto, userId);
     }
 
     [Description("Updates an existing entry. Allows changing description, amount, and status.")]
@@ -164,13 +165,12 @@ public class CashFlowAgent
 
         var existing = await _cashFlowService.GetByIdAsync(id, userId);
 
-        var dto = new CreateCashFlow
+        var dto = new CreateCashFlowDto
         {
             Description = description ?? existing.Description,
             Status = status ?? existing.Status,
             Amount = amount ?? existing.Amount,
             Type = existing.Type,
-            UserId = userId,
         };
 
         return await _cashFlowService.UpdateAsync(id, dto);
@@ -186,4 +186,3 @@ public class CashFlowAgent
         return $"Entry {id} successfully removed.";
     }
 }
-

@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;
 
-[Route("api/[controller]")]
-[ApiController]
 [Authorize]
+[ApiController]
+[Route("api/[controller]")]
 public class CashFlowController : ControllerBase
 {
     private readonly CashFlowService _cashflowService;
@@ -19,18 +19,17 @@ public class CashFlowController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromBody] CreateCashFlow cashflow)
+    public async Task<IActionResult> Add([FromBody] CreateCashFlowDto cashflow)
     {
-        var userId = User.FindFirstValue(ClaimTypes.Sid);
-        cashflow.UserId = userId;
+        var userId = User.FindFirstValue(ClaimTypes.Sid)!;
 
-        var result = await _cashflowService.AddAsync(cashflow);
+        var result = await _cashflowService.AddAsync(cashflow, userId);
 
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] CashFlowsGetAll query)
+    public async Task<IActionResult> GetAll([FromQuery] CashFlowsGetAllDto query)
     {
         var userId = User.FindFirstValue(ClaimTypes.Sid);
 
@@ -50,10 +49,9 @@ public class CashFlowController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(string id, [FromBody] CreateCashFlow cashflow)
+    public async Task<IActionResult> Update(string id, [FromBody] CreateCashFlowDto cashflow)
     {
         var userId = User.FindFirstValue(ClaimTypes.Sid);
-        cashflow.UserId = userId;
 
         var result = await _cashflowService.UpdateAsync(id, cashflow);
 

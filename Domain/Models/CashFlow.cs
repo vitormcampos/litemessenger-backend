@@ -5,7 +5,7 @@ public class CashFlow
     public string? Id { get; set; }
     public string Description { get; set; }
     public decimal Amount { get; set; }
-    public int Mouth { get; set; }
+    public int Month { get; set; }
     public int Year { get; set; }
     public DateTime CreatedAt { get; set; }
     public User User { get; set; }
@@ -16,7 +16,7 @@ public class CashFlow
     public CashFlow(
         string description,
         decimal amount,
-        int mouth,
+        int month,
         int year,
         User user,
         CashFlowStatus status,
@@ -31,9 +31,9 @@ public class CashFlow
         {
             throw new ArgumentException("Amount cannot be zero or negative.", nameof(amount));
         }
-        if (mouth < 1 || mouth > 12)
+        if (month < 1 || month > 12)
         {
-            throw new ArgumentException("Mouth must be between 1 and 12.", nameof(mouth));
+            throw new ArgumentException("Month must be between 1 and 12.", nameof(month));
         }
         if (year <= DateTime.Now.Year - 1)
         {
@@ -50,7 +50,7 @@ public class CashFlow
         Id = Guid.NewGuid().ToString();
         Description = description;
         Amount = amount;
-        Mouth = mouth;
+        Month = month;
         Year = year;
         Status = status;
         Type = type;

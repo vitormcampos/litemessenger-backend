@@ -27,7 +27,7 @@ public class CashFlowTest
         // Arrange
         var description = "Test Cash Flow";
         var amount = 100.00m;
-        var mouth = 1;
+        var month = 1;
         var year = DateTime.Now.Year;
         var user = _user;
 
@@ -35,7 +35,7 @@ public class CashFlowTest
         var cashFlow = new CashFlow(
             description,
             amount,
-            mouth,
+            month,
             year,
             user,
             CashFlowStatus.PENDING,
@@ -72,7 +72,7 @@ public class CashFlowTest
     {
         // Arrange
         var amount = 100.00m;
-        var mouth = 1;
+        var month = 1;
         var year = DateTime.Now.Year;
         var user = _user;
 
@@ -81,7 +81,7 @@ public class CashFlowTest
             new CashFlow(
                 description,
                 amount,
-                mouth,
+                month,
                 year,
                 user,
                 CashFlowStatus.PENDING,
@@ -98,7 +98,7 @@ public class CashFlowTest
     {
         // Arrange
         var description = "Test Cash Flow";
-        var mouth = 1;
+        var month = 1;
         var year = DateTime.Now.Year;
         var user = _user;
 
@@ -108,7 +108,7 @@ public class CashFlowTest
             return new CashFlow(
                 description,
                 amount,
-                mouth,
+                month,
                 year,
                 user,
                 CashFlowStatus.PENDING,
@@ -124,7 +124,7 @@ public class CashFlowTest
     [InlineData(null)]
     [InlineData(0)]
     [InlineData(13)]
-    public void ShouldThrowForInvalidMonth(int mouth)
+    public void ShouldThrowForInvalidMonth(int month)
     {
         // Arrange
         var description = "Test Cash Flow";
@@ -138,7 +138,7 @@ public class CashFlowTest
             return new CashFlow(
                 description,
                 amount,
-                mouth,
+                month,
                 year,
                 user,
                 CashFlowStatus.PENDING,
@@ -156,7 +156,7 @@ public class CashFlowTest
         // Arrange
         var description = "Test Cash Flow";
         var amount = 100.00m;
-        var mouth = 1;
+        var month = 1;
         var years = new[] { 0, DateTime.Now.Year - 1 };
         var user = _user;
 
@@ -168,7 +168,7 @@ public class CashFlowTest
                 return new CashFlow(
                     description,
                     amount,
-                    mouth,
+                    month,
                     year,
                     user,
                     CashFlowStatus.PENDING,
@@ -195,7 +195,7 @@ public class CashFlowTest
         // Arrange
         var description = "Test Cash Flow";
         var amount = 100.00m;
-        var mouth = 1;
+        var month = 1;
         var year = DateTime.Now.Year;
 
         // Act
@@ -204,7 +204,7 @@ public class CashFlowTest
             return new CashFlow(
                 description,
                 amount,
-                mouth,
+                month,
                 year,
                 null!,
                 CashFlowStatus.PENDING,

@@ -2,7 +2,7 @@
 
 namespace Domain.Dtos.CashFlow;
 
-public record CashFlowsGetAll(
+public record CashFlowsGetAllDto(
     string? Description,
     decimal? MinValue,
     decimal? MaxValue,
