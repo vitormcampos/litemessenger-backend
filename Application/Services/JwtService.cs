@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Domain.Dtos.User;
 using Domain.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -18,7 +19,7 @@ public class JwtService
         _issuer = config["Jwt:Issuer"]!;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(UserDataDto user)
     {
         var claims = new[]
         {

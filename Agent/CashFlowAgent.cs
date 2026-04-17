@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Text.Json;
 using Application.Services;
 using Domain.Dtos.CashFlow;
 using Domain.Models;
@@ -21,25 +22,59 @@ public class CashFlowAgent
         _configuration = configuration;
         _cashFlowService = cashFlowService;
 
-        var systemPrompt =
-            @$"
-                - Você é um assistente financeiro que ajuda os usuários a gerenciar suas finanças pessoais. Você pode consultar, adicionar, atualizar e excluir contas financeiras, como receitas, despesas e investimentos.
-                - Se atente ao tipo de registro financeiro (receita, despesa ou investimento) e ao status (pago ou pendente) ao lidar com as contas financeiras.
-                - Sempre que possível, forneça respostas em formato markdown para melhor legibilidade.
-                - Utilize as tools disponíveis para interagir com o sistema financeiro conforme necessário.
-                - Lembre-se de respeitar o ID do usuário ao acessar ou modificar dados financeiros.
-        ";
+        var systemPrompt = """
+            # CashFlow Agent - Personal Finance Assistant
+
+            You are a specialized financial assistant helping users manage their personal finances. Your goal is to facilitate tracking of income, expenses, and investments.
+
+            ## Business Rules
+
+            1. **Record Types**:
+               - INCOME: money coming in (salary, freelance, earnings)
+               - EXPENSE: money going out (bills, purchases, services)
+               - INVESTMENT: financial applications (fixed income, stocks)
+
+            2. **Status**:
+               - PAID: transaction already completed/confirmed
+               - PENDING: transaction planned but not yet confirmed
+
+            3. **Validations**:
+               - Values must always be greater than zero
+               - userId is required for any operation
+               - Description must be clear and objective
+
+            4. **Security**:
+               - Never expose other users' data
+               - Always filter by userId in queries
+
+            ## Behavior
+
+            - Use tools for ALL data operations (never make up data)
+            - Provide responses in markdown format for better readability
+            - When querying data, summarize relevant information
+            - For create/update operations, confirm details before executing
+            - Include totals and analysis when relevant (e.g., total expenses for the month)
+
+            ## Usage Examples
+
+            - "List my expenses for this month"
+            - "How much did I spend on food this week?"
+            - "Register a freelance income of $5000"
+            - "Update the status to paid for the electricity bill"
+            """;
 
         _agent = new OpenAIClient(_configuration["OpenAI:Key"])
             .GetChatClient("gpt-4o-mini")
             .AsAIAgent(
                 instructions: systemPrompt,
                 name: "CashFlowAgent",
-                description: "An AI agent that helps manage and analyze cash flow data.",
+                description: "Personal finance assistant for managing income, expenses, and investments.",
                 tools:
                 [
-                    AIFunctionFactory.Create(GetCashFlowDataTool),
-                    AIFunctionFactory.Create(CreateCashFlowDataTool),
+                    AIFunctionFactory.Create(GetCashFlowTool),
+                    AIFunctionFactory.Create(CreateCashFlowTool),
+                    AIFunctionFactory.Create(UpdateCashFlowTool),
+                    AIFunctionFactory.Create(DeleteCashFlowTool),
                 ]
             );
     }
@@ -52,22 +87,16 @@ public class CashFlowAgent
         return await _agent.RunAsync(message: message, cancellationToken: cancellationToken);
     }
 
-    [Description("Retrieves cash flow data based on the provided parameters.")]
-    public async Task<IEnumerable<CashFlow>> GetCashFlowDataTool(
-        [Description("A description to filter cash flow data.")] string? description,
-        [Description("The month of the cash flow data to retrieve.")] sbyte? month,
-        [Description("The year of the cash flow data to retrieve.")] sbyte? year,
-        [Description("The minimum value of the cash flow data to retrieve.")] decimal? minValue,
-        [Description("The maximum value of the cash flow data to retrieve.")] decimal? maxValue,
-        [Description("The ID of the user to retrieve cash flow data for.")] string? userId,
-        [Description(
-            "The status of the cash flow data to retrieve. [PAID, PENDING] or null for all."
-        )]
-            CashFlowStatus? status = null,
-        [Description(
-            "The type of the cash flow data to retrieve. [INCOME, EXPENSE, INVESTMENT] or null for all."
-        )]
-            CashFlowType? type = null
+    [Description("Retrieves financial entries with filters. Use to list transactions, search by period, type, or amount.")]
+    public async Task<IEnumerable<CashFlow>> GetCashFlowTool(
+        [Description("Filter by description (partial match)")] string? description,
+        [Description("Month of the entry (1-12)")] sbyte? month,
+        [Description("Year of the entry")] sbyte? year,
+        [Description("Minimum amount")] decimal? minValue,
+        [Description("Maximum amount")] decimal? maxValue,
+        [Description("User ID")] string userId,
+        [Description("Status: PAID or PENDING")] CashFlowStatus? status,
+        [Description("Type: INCOME, EXPENSE, or INVESTMENT")] CashFlowType? type
     )
     {
         var dto = new CashFlowsGetAll(
@@ -81,20 +110,32 @@ public class CashFlowAgent
             UserId: userId
         );
 
-        var data = await _cashFlowService.GetAllAsync(dto);
-        return data;
+        return await _cashFlowService.GetAllAsync(dto);
     }
 
-    [Description("Creates a new cash flow entry with the provided details.")]
-    public async Task<CashFlow> CreateCashFlowDataTool(
-        [Description("A description of the cash flow entry.")] string description,
-        [Description("The status of the cash flow entry. [PAID, PENDING]")] CashFlowStatus status,
-        [Description("The amount of the cash flow entry.")] decimal amount,
-        [Description("The type of the cash flow entry. [INCOME, EXPENSE, INVESTMENT]")]
-            CashFlowType type,
-        [Description("The ID of the user to create the cash flow entry for.")] string userId
+    [Description("Retrieves a specific entry by ID.")]
+    public async Task<CashFlow> GetCashFlowByIdTool(
+        [Description("Entry ID")] string id,
+        [Description("User ID")] string userId
     )
     {
+        return await _cashFlowService.GetByIdAsync(id, userId);
+    }
+
+    [Description("Creates a new financial entry (income, expense, or investment).")]
+    public async Task<CashFlow> CreateCashFlowTool(
+        [Description("Description of the entry (e.g., Salary, Rent, Stocks)")] string description,
+        [Description("Status: PAID or PENDING")] CashFlowStatus status,
+        [Description("Amount in dollars (must be greater than zero)")] decimal amount,
+        [Description("Type: INCOME, EXPENSE, or INVESTMENT")] CashFlowType type,
+        [Description("User ID")] string userId
+    )
+    {
+        if (amount <= 0)
+        {
+            throw new ArgumentException("Amount must be greater than zero.", nameof(amount));
+        }
+
         var dto = new CreateCashFlow
         {
             Description = description,
@@ -104,29 +145,45 @@ public class CashFlowAgent
             UserId = userId,
         };
 
-        var data = await _cashFlowService.AddAsync(dto);
-        return data;
+        return await _cashFlowService.AddAsync(dto);
     }
-}
 
-class OpenAITool : AITool
-{
-    public OpenAITool(
-        string name,
-        string description,
-        Func<Dictionary<string, object>, Task<object>> executeAsync
+    [Description("Updates an existing entry. Allows changing description, amount, and status.")]
+    public async Task<CashFlow> UpdateCashFlowTool(
+        [Description("ID of the entry to update")] string id,
+        [Description("New description (optional)")] string? description,
+        [Description("New status: PAID or PENDING (optional)")] CashFlowStatus? status,
+        [Description("New amount (optional, must be greater than zero)")] decimal? amount,
+        [Description("User ID")] string userId
     )
-        : base()
     {
-        ExecuteAsync = executeAsync;
-        _name = name;
-        _description = description;
+        if (amount.HasValue && amount.Value <= 0)
+        {
+            throw new ArgumentException("Amount must be greater than zero.", nameof(amount));
+        }
+
+        var existing = await _cashFlowService.GetByIdAsync(id, userId);
+
+        var dto = new CreateCashFlow
+        {
+            Description = description ?? existing.Description,
+            Status = status ?? existing.Status,
+            Amount = amount ?? existing.Amount,
+            Type = existing.Type,
+            UserId = userId,
+        };
+
+        return await _cashFlowService.UpdateAsync(id, dto);
     }
 
-    private string _name = string.Empty;
-    private string _description = string.Empty;
-
-    public override string Name => _name;
-    public override string Description => _description;
-    public Func<Dictionary<string, object>, Task<object>> ExecuteAsync { get; }
+    [Description("Removes a financial entry. Use with caution!")]
+    public async Task<string> DeleteCashFlowTool(
+        [Description("ID of the entry to remove")] string id,
+        [Description("User ID")] string userId
+    )
+    {
+        await _cashFlowService.DeleteAsync(id, userId);
+        return $"Entry {id} successfully removed.";
+    }
 }
+

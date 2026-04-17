@@ -5,39 +5,30 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class AuthController(JwtService jwtService, UserService userService) : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto createUser)
+    public async Task<IActionResult> Register([FromBody] UserRegisterDto createUser)
     {
-        if (createUser.ConfirmPassword != createUser.Password)
-        {
-            return BadRequest("Password and confirmPassword does not match");
-        }
-
-        var user = await userService.CreateUser(createUser.Username, createUser.Password);
+        var user = await userService.Register(createUser);
 
         return Ok(new { user.Id, user.Username });
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto loginUser)
+    public async Task<IActionResult> Login([FromBody] UserLoginDto loginUser)
     {
-        var user = await userService.Login(loginUser.Username, loginUser.Password);
-        if (user == null)
-        {
-            return Unauthorized(new { message = "Invalid username or password" });
-        }
+        var user = await userService.Login(loginUser);
 
         var token = jwtService.GenerateToken(user);
 
         return Ok(new { token });
     }
 
-    [HttpGet("check-auth")]
     [Authorize]
+    [HttpGet("check-auth")]
     public IActionResult CheckAuth()
     {
         return Ok(new { message = "Authenticated" });

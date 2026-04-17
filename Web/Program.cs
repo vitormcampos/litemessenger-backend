@@ -3,10 +3,14 @@ using Application.Ioc;
 using Microsoft.Extensions.AI;
 using OpenAI.Chat;
 using Scalar.AspNetCore;
+using Web.ExceptionHandlers;
 using Web.Extensions;
 using Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -37,6 +41,8 @@ builder.Services.AddApplicationServices();
 builder.Services.AddAgentServices();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
