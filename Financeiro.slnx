@@ -5,6 +5,7 @@
   <Folder Name="/Solution Items/docker/">
     <File Path="docker-compose.yml" />
   </Folder>
+  <Project Path="Domain.Test/Domain.Test.csproj" />
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Web/Web.csproj" />
   <Project Path="Agent/Agent.csproj" />
