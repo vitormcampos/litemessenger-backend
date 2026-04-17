@@ -115,4 +115,28 @@ public class UserTest
         // Act & Assert
         Assert.Throws<ArgumentException>(() => new User(username, email, passwordHash));
     }
+
+    [Fact]
+    public void UpdateUsernameShouldThrowForNullOrEmpty()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => _user.UpdateUsername(null!));
+        Assert.Throws<ArgumentException>(() => _user.UpdateUsername(""));
+    }
+
+    [Fact]
+    public void UpdateEmailShouldThrowForNullOrEmpty()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => _user.UpdateEmail(null!));
+        Assert.Throws<ArgumentException>(() => _user.UpdateEmail(""));
+    }
+
+    [Fact]
+    public void UpdatePasswordHashShouldThrowForNullOrEmpty()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => _user.UpdatePasswordHash(null!));
+        Assert.Throws<ArgumentException>(() => _user.UpdatePasswordHash(""));
+    }
 }
