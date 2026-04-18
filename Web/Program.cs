@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Application.Ioc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.AI;
 using OpenAI.Chat;
 using Scalar.AspNetCore;
@@ -8,6 +10,22 @@ using Web.Extensions;
 using Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter(
+        policyName: "fixed",
+        opt =>
+        {
+            opt.PermitLimit = 10;
+            opt.Window = TimeSpan.FromSeconds(10);
+            opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+            opt.QueueLimit = 2;
+        }
+    );
+
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -42,6 +60,8 @@ builder.Services.AddAgentServices();
 
 var app = builder.Build();
 
+app.UseRateLimiter();
+
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
@@ -68,7 +88,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().RequireRateLimiting("fixed");
 
 app.MapHub<ChatHub>("chat");
 
