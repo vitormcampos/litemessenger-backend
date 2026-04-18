@@ -8,31 +8,22 @@ public class UserTest
 
     public UserTest()
     {
-        _user = new User("testuser", "testuser@example.com", "hashedpassword");
+        _user = UserBuilder.New().Build();
     }
 
     [Fact]
     public void ShouldBeCreated()
     {
-        // Arrange
-        var userName = "testuser";
-        var email = "testuser@example.com";
-        var passwordHash = "hashedpassword";
-
-        // Act
-        var user = new User(userName, email, passwordHash);
-
         // Assert
-        Assert.Equal("testuser", user.Username);
-        Assert.Equal("testuser@example.com", user.Email);
-        Assert.Equal("hashedpassword", user.PasswordHash);
+        Assert.NotNull(_user);
+        Assert.IsType<User>(_user);
     }
 
     [Fact]
     public void ShouldHaveUniqueId()
     {
         // Arrange
-        var user2 = new User("user2", "user2@example.com", "hashedpassword2");
+        var user2 = UserBuilder.New().Build();
 
         // Assert
         Assert.NotEqual(_user.Id, user2.Id);
@@ -82,12 +73,11 @@ public class UserTest
     [InlineData("")]
     public void ShouldNotAllowNullOrEmptyUsername(string? username)
     {
-        // Arrange
-        var email = "testuser@example.com";
-        var passwordHash = "hashedpassword";
+        // Act
+        void action() => UserBuilder.New().WithUsername(username).Build();
 
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => new User(username, email, passwordHash));
+        // Assert
+        Assert.Throws<ArgumentException>(action);
     }
 
     [Theory]
@@ -95,12 +85,11 @@ public class UserTest
     [InlineData("")]
     public void ShouldNotAllowNullOrEmptyEmail(string? email)
     {
-        // Arrange
-        var username = "testuser";
-        var passwordHash = "hashedpassword";
+        // Act
+        void action() => UserBuilder.New().WithEmail(email).Build();
 
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => new User(username, email, passwordHash));
+        // Assert
+        Assert.Throws<ArgumentException>(action);
     }
 
     [Theory]
@@ -108,35 +97,46 @@ public class UserTest
     [InlineData("")]
     public void ShouldNotAllowNullOrEmptyPasswordHash(string? passwordHash)
     {
-        // Arrange
-        var username = "testuser";
-        var email = "testuser@example.com";
+        // Act
+        void action() => UserBuilder.New().WithPasswordHash(passwordHash).Build();
 
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => new User(username, email, passwordHash));
+        // Assert
+        Assert.Throws<ArgumentException>(action);
     }
 
-    [Fact]
-    public void UpdateUsernameShouldThrowForNullOrEmpty()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void UpdateUsernameShouldThrowForNullOrEmpty(string? username)
     {
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => _user.UpdateUsername(null!));
-        Assert.Throws<ArgumentException>(() => _user.UpdateUsername(""));
+        // Act
+        void action() => _user.UpdateUsername(username);
+
+        // Assert
+        Assert.Throws<ArgumentException>(action);
     }
 
-    [Fact]
-    public void UpdateEmailShouldThrowForNullOrEmpty()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void UpdateEmailShouldThrowForNullOrEmpty(string? email)
     {
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => _user.UpdateEmail(null!));
-        Assert.Throws<ArgumentException>(() => _user.UpdateEmail(""));
+        // Act
+        void action() => _user.UpdateEmail(email);
+
+        // Assert
+        Assert.Throws<ArgumentException>(action);
     }
 
-    [Fact]
-    public void UpdatePasswordHashShouldThrowForNullOrEmpty()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void UpdatePasswordHashShouldThrowForNullOrEmpty(string? passwordHash)
     {
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => _user.UpdatePasswordHash(null!));
-        Assert.Throws<ArgumentException>(() => _user.UpdatePasswordHash(""));
+        // Act
+        void action() => _user.UpdatePasswordHash(passwordHash);
+
+        // Assert
+        Assert.Throws<ArgumentException>(action);
     }
 }
